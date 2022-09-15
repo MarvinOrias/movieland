@@ -35,8 +35,6 @@ export default function App(){
 		}
 	},[]);
 
-	console.log(movies)
-
 	return(
 			<div className="app">
 				<h1>MovieLand</h1>
