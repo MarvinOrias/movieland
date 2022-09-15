@@ -1,63 +1,74 @@
-import {useState, useEffect} from 'react';
-import './App.css';
+import React, {useEffect, useState, useRef} from 'react';
 
-const Person = (props) => {
-  return(
-  <>
-    <h1>Name: {props.name}</h1>
-    <h2>Last Name: {props.lName}</h2>
-    <h2>Age: {props.age}</h2>  
-  </>
-  )
+import './App.css';
+import SearchIcon from './search.svg';
+import MovieCard from './MovieCard';
+
+// 66f37742
+
+const URL = `http://www.omdbapi.com?apikey=66f37742`;
+
+export default function App(){
+	const ref = useRef(true);
+	const [movies, setMovies] = useState([]);
+	const [searchTerm, setSearchTerm] = useState('');
+
+	const movie1 = {
+    "Title": "Zombie 3",
+    "Year": "1988",
+    "imdbID": "tt0096511",
+    "Type": "movie",
+    "Poster": "https://m.media-amazon.com/images/M/MV5BNGY3MTBiYjQtNzM1MC00ZTVkLWE3MzYtZTk0YzdkMGFkYWUxXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg"
 };
 
-function App() {
-  const [value, setValue] = useState(0);
+	const searchMovies = async(title) => {
+		const response = await fetch(`${URL}&s=${title}`);
+		const data = await response.json();
 
-  useEffect(() => {
-    alert(`You have loaded the page`)
-  }, [value]);
-  
-  const addValue = () =>{
-    setValue(value+1);
-  }
-  function minusValue(){
-    if(value === 0){
-      alert(`Limit reached`)
-    }
-    else{
-      setValue((prevCount)=>(
-          prevCount - 1
-        ))
-    }
-  }
+		setMovies(data.Search);
+	};
 
-  const name = 'Jack';
-  const name1 = null;
-  const isNameShowing = true;
-  return (
-    <div className="App">
-      <h1>Hello React!</h1>
-      <h3>Hello {isNameShowing ? name : `Guest`}!</h3>
-      {name1 ? (
-      <>
-        test  
-      </>): (
-        <>
-          <h2>test</h2>
-          <h1>No name</h1>
-        </>
-      )}
-      <Person name={`Jane`} lName="Doe" age={30}/>
-      <Person name={`John`} lName="Doe" age={25}/>
-      <Person name={`Marvin`} lName="Orias" age={25}/>
-      <Person name={`Angela Greta`} lName="Matugas" age={21}/>
-      <Person name={`Atarah Elisha`} lName="Macaraig" age={4}/>
-      <button onClick={addValue}>INCREASE(+)</button>
-      <h1>{value}</h1>
-      <button onClick={minusValue}>DECREASE(-)</button>
-    </div>
-  );
+	useEffect(() => {
+		if(ref.current){
+			ref.current = false;
+			searchMovies('undefined');
+		}
+	},[]);
+
+	console.log(movies)
+
+	return(
+			<div className="app">
+				<h1>MovieLand</h1>
+
+				<div className="search">
+					<input type="text" placeholder="Search for movies" value={searchTerm} onChange={(e) => {setSearchTerm(e.target.value)}}/>
+					<img src={SearchIcon} alt="search" onClick={() => searchMovies(searchTerm)}/>
+				</div>
+
+				<div className="container">
+						{movies.map((movie)=>{
+							return(
+									<MovieCard key={movie.Title} movie1={movie} />
+								)
+						})}
+					</div>
+
+				{/*{
+					movies.length > 0 ?
+					<div className="container">
+						{movies.map((movie)=>{
+							return(
+									<MovieCard key={movie.Title} movie={movie} />
+								)
+						})}
+					</div>
+					:
+					<div className="empty">
+						<h2>No movies found</h2>
+					</div>
+				}*/}
+
+			</div>
+		);
 }
-
-export default App;
